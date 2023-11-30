@@ -3,9 +3,12 @@ package com.springboot.blog.service.impl;
 import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.PostDto;
+import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +20,17 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
 
     @Override
-    public List<PostDto> getAllPosts() {
+    public PostResponse getAllPosts(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
 
-        var posts = postRepository.findAll();
+        var sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
-        return posts.stream().map(this::mapToDto).toList();
+        var posts = postRepository.findAll(PageRequest.of(pageNo, pageSize, sort));
+        var content = posts.getContent().stream().map(this::mapToDto).toList();
+        var postResponse = new PostResponse(content, posts.getNumber(), posts.getSize(), posts.getSize(), posts.getTotalPages(), posts.isLast());
+
+        return  postResponse;
     }
 
     @Override
