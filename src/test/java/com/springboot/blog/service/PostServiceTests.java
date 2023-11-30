@@ -3,6 +3,7 @@ package com.springboot.blog.service;
 import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.PostDto;
+import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.impl.PostServiceImpl;
 import org.jeasy.random.EasyRandom;
@@ -12,7 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,18 +49,29 @@ public class PostServiceTests {
     void getPostsSuccessfully() {
 
         // Arrange
-        var mockPosts = generator.objects(Post.class, 3).collect(Collectors.toList());
-        when(postRepository.findAll()).thenReturn(mockPosts);
+        Integer pageNo = 0, pageSize = 3;
+        String sortBy = "id", sortDir = "ASC";
+        var pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).ascending());
+
+        List<Post> mockPosts = generator.objects(Post.class, pageSize).collect(Collectors.toList());
+        Page<Post> mockPage = new PageImpl<>(mockPosts, pageRequest, mockPosts.size());
+        when(postRepository.findAll(pageRequest)).thenReturn(mockPage);
 
         // Act
-        var sut = postService.getAllPosts();
+        PostResponse sut = postService.getAllPosts(pageNo, pageSize, sortBy, sortDir);
 
         // Assert
-        assertThat(sut).hasSize(mockPosts.size())
+        assertThat(sut.getContent()).hasSize(pageSize)
                 .allMatch(item -> item instanceof PostDto, "All items should be instances of PostDto");
+        assertThat(sut).isNotNull();
+        assertThat(sut.getPageNo()).isEqualTo(pageNo);
+        assertThat(sut.getPageSize()).isEqualTo(pageSize);
+        assertThat(sut.getTotalElements()).isEqualTo(mockPosts.size());
+        assertThat(sut.getTotalPages()).isEqualTo(mockPage.getTotalPages());
+        assertThat(sut.isLast()).isEqualTo(mockPage.isLast());
 
-        //Verify
-        verify(postRepository).findAll();
+        // Verify
+        verify(postRepository).findAll(pageRequest);
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.springboot.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.blog.payload.PostDto;
+import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.service.PostService;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,19 +47,29 @@ public class PostControllerTests {
 
     @Test
     public void getPostsSuccessfully() throws Exception {
-
         // Arrange
+        int pageNo = 0;
+        int pageSize = 10;
+        String sortBy = "createdAt";
+        String sortDir = "asc";
+
         var mockPosts = generator.objects(PostDto.class, 3).collect(Collectors.toList());
-        when(postService.getAllPosts()).thenReturn(mockPosts);
-        var postDtoListJson = mapper.writeValueAsString(mockPosts);
+        var postResponse = new PostResponse();
+        postResponse.setContent(mockPosts);
+        when(postService.getAllPosts(pageNo, pageSize, sortBy, sortDir)).thenReturn(postResponse);
+
+        var postResponseJson = mapper.writeValueAsString(postResponse);
 
         // Act & Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/api/posts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(postDtoListJson))
+                        .param("pageNo", String.valueOf(pageNo))
+                        .param("pageSize", String.valueOf(pageSize))
+                        .param("sortBy", sortBy)
+                        .param("sortDir", sortDir)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(postDtoListJson));
+                .andExpect(content().json(postResponseJson));
     }
 
     @Test
