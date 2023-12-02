@@ -46,7 +46,7 @@ public class PostControllerTests {
     }
 
     @Test
-    public void getPostsSuccessfully() throws Exception {
+    void getPostsSuccessfully() throws Exception {
         // Arrange
         int pageNo = 0;
         int pageSize = 10;
@@ -73,7 +73,7 @@ public class PostControllerTests {
     }
 
     @Test
-    public void getPostByIdSuccessfully() throws Exception {
+    void getPostByIdSuccessfully() throws Exception {
 
         // Arrange
         var postDto = generator.nextObject(PostDto.class);
@@ -90,7 +90,7 @@ public class PostControllerTests {
     }
 
     @Test
-    public void createPostSuccessfully() throws Exception {
+    void createPostSuccessfully() throws Exception {
 
         // Arrange
         PostDto postDto = generator.nextObject(PostDto.class);
@@ -107,7 +107,7 @@ public class PostControllerTests {
     }
 
     @Test
-    public void updatePostTest() throws Exception {
+    void updatePostTest() throws Exception {
 
         // Arrange
         var originalPostDto = generator.nextObject(PostDto.class);
@@ -127,7 +127,7 @@ public class PostControllerTests {
     }
 
     @Test
-    public void deletePostSuccessfully() throws Exception {
+    void deletePostSuccessfully() throws Exception {
 
         // Arrange
 
