@@ -7,6 +7,7 @@ import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final ModelMapper mapper;
 
     @Override
     public PostResponse getAllPosts(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
@@ -78,21 +80,11 @@ public class PostServiceImpl implements PostService {
 
     private PostDto mapToDto(Post post) {
 
-        var postDto = new PostDto();
-        postDto.setTitle(post.getTitle());
-        postDto.setDescription(post.getDescription());
-        postDto.setContent(post.getContent());
-
-        return postDto;
+        return mapper.map(post, PostDto.class);
     }
 
     private Post mapToEntity(PostDto postDto) {
 
-        var post = new Post();
-        post.setTitle(postDto.getTitle());
-        post.setDescription(postDto.getDescription());
-        post.setContent(postDto.getContent());
-
-        return post;
+        return mapper.map(postDto, Post.class);
     }
 }
