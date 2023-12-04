@@ -9,3 +9,8 @@ spring:
   sql:
     init:
       mode: never
+  security:
+    user:
+      name: gustavo
+      password: gustavo
+      roles: ADMIN

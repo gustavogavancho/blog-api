@@ -1,6 +1,7 @@
 package com.springboot.blog.service.impl;
 
 import com.springboot.blog.entity.Post;
+import com.springboot.blog.exception.CustomDuplicateTitleException;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.payload.PostResponse;
@@ -48,6 +49,14 @@ public class PostServiceImpl implements PostService {
     public PostDto createPost(PostDto postDto) {
 
         var post = mapToEntity(postDto);
+
+        if (postRepository.existsByTitle(postDto.getTitle())) {
+            throw new CustomDuplicateTitleException("A post with the title '" + postDto.getTitle() + "' already exists.");
+        }
+
+        if (post.getComments() != null) {
+            post.getComments().forEach(comment -> comment.setPost(post));
+        }
         var newPost = postRepository.save(post);
         var postDtoResponse = mapToDto(newPost);
 

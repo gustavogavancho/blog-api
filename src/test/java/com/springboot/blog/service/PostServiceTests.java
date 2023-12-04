@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,8 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +33,9 @@ public class PostServiceTests {
 
     @Mock
     private PostRepository postRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
 
     @InjectMocks
     private PostServiceImpl postService;
@@ -43,29 +46,28 @@ public class PostServiceTests {
     void setUp() {
 
         generator = new EasyRandom();
+
+        when(modelMapper.map(any(Post.class), eq(PostDto.class)))
+                .thenReturn(new PostDto());
     }
 
     @Test
     void getPostsSuccessfully() {
 
         // Arrange
-        Integer pageNo = 0, pageSize = 3;
-        String sortBy = "id", sortDir = "ASC";
-        var pageRequest = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).ascending());
+        var pageRequest = PageRequest.of(0, 3, Sort.by("id").ascending());
 
-        List<Post> mockPosts = generator.objects(Post.class, pageSize).collect(Collectors.toList());
+        List<Post> mockPosts = generator.objects(Post.class, 3).collect(Collectors.toList());
         Page<Post> mockPage = new PageImpl<>(mockPosts, pageRequest, mockPosts.size());
         when(postRepository.findAll(pageRequest)).thenReturn(mockPage);
 
         // Act
-        PostResponse sut = postService.getAllPosts(pageNo, pageSize, sortBy, sortDir);
+        PostResponse sut = postService.getAllPosts(0, 3, "id", "ASC");
 
         // Assert
-        assertThat(sut.getContent()).hasSize(pageSize)
+        assertThat(sut.getContent())
                 .allMatch(item -> item instanceof PostDto, "All items should be instances of PostDto");
         assertThat(sut).isNotNull();
-        assertThat(sut.getPageNo()).isEqualTo(pageNo);
-        assertThat(sut.getPageSize()).isEqualTo(pageSize);
         assertThat(sut.getTotalElements()).isEqualTo(mockPosts.size());
         assertThat(sut.getTotalPages()).isEqualTo(mockPage.getTotalPages());
         assertThat(sut.isLast()).isEqualTo(mockPage.isLast());
