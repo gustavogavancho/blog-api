@@ -13,3 +13,12 @@ INSERT INTO posts (title, description, content) VALUES ('Post 12', 'Post 12 Desc
 INSERT INTO posts (title, description, content) VALUES ('Post 13', 'Post 13 Description', 'Post 13 Content')
 INSERT INTO posts (title, description, content) VALUES ('Post 14', 'Post 14 Description', 'Post 14 Content')
 INSERT INTO posts (title, description, content) VALUES ('Post 15', 'Post 15 Description', 'Post 15 Content')
+
+INSERT INTO users (email, username, name, password) VALUES('gustavo@gmail.com', 'ggavanch', 'Gustavo', '$2a$10$QESJRAOldMYekuXxbM5IkOO1n9beEjiIzatNVMDKaNhFAuE7XuzMi')
+INSERT INTO users (email, username, name, password) VALUES('admin@admin.com', 'admin', 'Admin', '$2a$10$UwJVAdS/gr0P99iC8GDQ7O/Okk8Dd5aD6kmol8zyf3XYnK1GS1jeS')
+
+INSERT INTO roles (name) VALUES ('ROLE_USER')
+INSERT INTO roles (name) VALUES('ROLE_ADMIN')
+
+INSERT INTO users_roles (user_id, role_id) VALUES(1,  1)
+INSERT INTO users_roles (user_id, role_id) VALUES(2,  2)
