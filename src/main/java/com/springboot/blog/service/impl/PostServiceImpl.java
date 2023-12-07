@@ -5,6 +5,7 @@ import com.springboot.blog.exception.CustomDuplicateTitleException;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.payload.PostResponse;
+import com.springboot.blog.repository.CategoryRepository;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final CategoryRepository categoryRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -48,15 +50,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto createPost(PostDto postDto) {
 
-        var post = mapToEntity(postDto);
-
         if (postRepository.existsByTitle(postDto.getTitle())) {
             throw new CustomDuplicateTitleException("A post with the title '" + postDto.getTitle() + "' already exists.");
         }
 
-        if (post.getComments() != null) {
-            post.getComments().forEach(comment -> comment.setPost(post));
-        }
+        var category = categoryRepository.findById(postDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", postDto.getCategoryId()));
+
+        var post = mapToEntity(postDto);
+        post.setCategory(category);
         var newPost = postRepository.save(post);
         var postDtoResponse = mapToDto(newPost);
 
@@ -66,14 +68,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto updatePost(Long id, PostDto postDto) {
 
-        var postEntity = postRepository.findById(id)
+        var post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
 
-        postEntity.setTitle(postDto.getTitle());
-        postEntity.setDescription(postDto.getDescription());
-        postEntity.setContent(postDto.getContent());
+        var category = categoryRepository.findById(postDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", postDto.getCategoryId()));
 
-        var entitySaved = postRepository.save(postEntity);
+        post.setCategory(category);
+        post.setTitle(postDto.getTitle());
+        post.setDescription(postDto.getDescription());
+        post.setContent(postDto.getContent());
+
+        var entitySaved = postRepository.save(post);
 
         return mapToDto(entitySaved);
     }
@@ -85,6 +91,17 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
 
         postRepository.delete(postEntity);
+    }
+
+    @Override
+    public List<PostDto> getPostsByCategory(Long id) {
+
+        var category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+
+        var postDtos = postRepository.findByCategoryId(id);
+
+        return postDtos.stream().map((post) -> mapToDto(post)).toList();
     }
 
     private PostDto mapToDto(Post post) {

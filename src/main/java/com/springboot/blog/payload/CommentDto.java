@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class CommentDto {
 
+    private Long id;
+
     @NotEmpty(message = "Name should not be null or empty.")
     private String name;
 

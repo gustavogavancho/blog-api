@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/posts")
 @RequiredArgsConstructor
@@ -57,5 +59,13 @@ public class PostController {
         postService.deletePost(id);
 
         return ResponseEntity.ok("Entity deleted successfully");
+    }
+
+    @GetMapping("categories/{id}")
+    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable  Long id) {
+
+        var postDtos = postService.getPostsByCategory(id);
+
+        return ResponseEntity.ok(postDtos);
     }
 }
