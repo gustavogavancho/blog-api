@@ -1,6 +1,7 @@
 package com.springboot.blog.controller;
 
 import com.springboot.blog.payload.PostDto;
+import com.springboot.blog.payload.PostDtoV2;
 import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.AppConstants;
@@ -16,10 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/posts")
+@RequestMapping("api/v1/posts")
 @Tag(name = "CRUD REST APIs for Post Resource")
 @RequiredArgsConstructor
 public class PostController {
