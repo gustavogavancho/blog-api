@@ -1,19 +1,6 @@
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/myblog
-    username: root
-    password: 1234
-  jpa:
-    hibernate:
-      ddl-auto: update
-  sql:
-    init:
-      mode: never
-  security:
-    user:
-      name: gustavo
-      password: gustavo
-      roles: ADMIN
+  profiles:
+    active: prod
 
 app:
   jwt:
