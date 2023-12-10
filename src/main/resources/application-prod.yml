@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/myblog
+    url: jdbc:mysql://javaguides.cj8ecxrwgxxm.us-east-1.rds.amazonaws.com:3306/myblog
     username: root
-    password: 1234
+    password: Mysql123
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,3 +14,6 @@ spring:
       name: gustavo
       password: gustavo
       roles: ADMIN
+
+server:
+  port: 5000
